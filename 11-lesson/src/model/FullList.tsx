@@ -1,4 +1,5 @@
 import ListItem from "./ListItem";
+
 interface List {
   list: ListItem[];
   load(): void;
@@ -7,34 +8,32 @@ interface List {
   addItem(itemObj: ListItem): void;
   removeItem(id: string): void;
 }
+
 export default class FullList implements List {
-    // 
   static instance: FullList = new FullList();
+
   private constructor(private _list: ListItem[] = []) {}
+
   get list(): ListItem[] {
-    return this.list;
+    return this._list;
   }
+
   load(): void {
-    // find storelist:
-    const storeList: string | null = localStorage.getItem("mylist");
-    // 1. if list not exist
-    if (typeof storeList !== "string") {
-      return;
-    }
-    // 2. if list exist --> take it
-    const parsedList: {
-      _id: string;
-      _item: string;
-      _checked: boolean;
-    }[] = JSON.parse(storeList);
+    const storedList: string | null = localStorage.getItem("myList");
+    if (typeof storedList !== "string") return;
+
+    const parsedList: { _id: string; _item: string; _checked: boolean }[] = JSON.parse(storedList);
+
     parsedList.forEach((itemObj) => {
       const newListItem = new ListItem(itemObj._id, itemObj._item, itemObj._checked);
-      FullList.instance.addItem(newListItem)
+      FullList.instance.addItem(newListItem);
     });
   }
+
   save(): void {
-    localStorage.setItem("mylist", JSON.stringify(this._list));
+    localStorage.setItem("myList", JSON.stringify(this._list));
   }
+
   clearList(): void {
     this._list = [];
     this.save();
@@ -44,6 +43,7 @@ export default class FullList implements List {
     this._list.push(itemObj);
     this.save();
   }
+
   removeItem(id: string): void {
     this._list = this._list.filter((item) => item.id !== id);
     this.save();
